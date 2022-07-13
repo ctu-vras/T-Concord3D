@@ -49,9 +49,9 @@ RUN pip3 install *.whl
 
 ## Install Cylinder 3D
 WORKDIR /
-RUN git clone --recursive --depth 1 https://github.com/xinge008/Cylinder3D
-WORKDIR /Cylinder3D
-RUN chmod +x train_nusc.sh
-RUN mkdir -p /data/dataset/nuScenes
+RUN git clone --recursive --depth 1 https://github.com/ctu-vras/T-Concord3D
+WORKDIR /T-Concord3D
+RUN chmod +x train.sh
+RUN chmod +x test.sh
 
 

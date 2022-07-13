@@ -15,5 +15,5 @@ ml PyTorch-Geometric/2.0.2-foss-2021a-CUDA-11.3.1-PyTorch-1.10.0
 cd ../..
 name=T-Concord3D
 
-python3 test_T-Concord3d.py --config_path 'config/semantickitti/semantickitti_S0_0_T11_33_ssl_33_s20_p80.yaml' \
+python3 test.py --config_path 'config/semantickitti/semantickitti_S0_0_T11_33_ssl_33_s20_p80.yaml' \
 --mode 'test' --save 'True' --challenge 'True' 2>&1 | tee logs_dir/${name}_logs_test_f0_0_T11_33_ssl_s20_p80.txt
