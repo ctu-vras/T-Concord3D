@@ -1,8 +1,8 @@
 
 # Teachers in concordance for pseudo-labeling of 3D sequential data 
 
- The source code of our work **"Teachers in concordance for pseudo-labeling of 3D sequential data**
-![img│center](./img/concordance-architecture.png)
+ The source code of our work **Teachers in concordance for pseudo-labeling of 3D sequential data**
+![img│center](./image/concordance-architecture.png)
 Proposed Concordance of teachers for pseudo-
 labeling of sequences. A set Dℓ of sequences with central
 frame labeled, and a larger set Du of unannotated ones, are
