@@ -16,5 +16,5 @@ cd ../..
 
 name=T-concord3D
 
-python test_cylinder_asym.py --config_path 'config/semantickitti/semantickitti_T3_3_s20.yaml' \
+python test_T-Concord3d.py --config_path 'config/semantickitti/semantickitti_T3_3_s20.yaml' \
 --mode 'infer' --save 'True' 2>&1 | tee logs_dir/${name}_logs_test_T3_3_s20.txt

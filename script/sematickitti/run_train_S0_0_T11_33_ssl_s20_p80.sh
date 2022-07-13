@@ -16,5 +16,5 @@ cd ../..
 
 name=T-Concord3D
 
-python train_cylinder_asym.py --config_path 'config/semantickitti/semantickitti_S0_0_T11_33_ssl_s20_p80.yaml' \
+python train_T-Concord3d.py --config_path 'config/semantickitti/semantickitti_S0_0_T11_33_ssl_s20_p80.yaml' \
  2>&1 | tee logs_dir/${name}_logs_semantickitti_S0_0_T11_33.txt

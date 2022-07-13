@@ -15,5 +15,5 @@ ml PyTorch-Geometric/2.0.2-foss-2021a-CUDA-11.3.1-PyTorch-1.10.0
 cd ../..
 name=T-Concord3D
 
-python tools/train_cylinder_asym.py --config_path 'config/semantickitti/semantickitti_T1_1_s20.yaml' \
+python train_T-Concord3d.py --config_path 'config/semantickitti/semantickitti_T1_1_s20.yaml' \
 2>&1 | tee logs_dir/${name}_logs_tee_T1_1_s20.txt
