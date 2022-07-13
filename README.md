@@ -19,8 +19,6 @@ The student is trained on Dℓ ∪ Dp, to work online with past and current fram
 
 ### Requirements
 - PyTorch >= 1.7
-- yaml
-- Cython
 - [torch-scatter](https://github.com/rusty1s/pytorch_scatter)
 - [spconv](https://github.com/traveller59/spconv) (tested with spconv==2.0 and cuda==11.0)
 
