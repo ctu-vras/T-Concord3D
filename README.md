@@ -105,7 +105,7 @@ unlabeled dataset Du as shown bellow.
 1. modify the config/semantickitti/semantickitti_T3_3_s20.yaml with your custom settings. We provide a sample yaml for SemanticKITTI multi-frame (both past and future) aggregation
 2. train the network by running 
    ```
-   sh script/sematickitti/train_T3_3_s20.sh
+   sh script/sematickitti/run_train_T3_3_s20.sh
    ```
 
 ### Generate Concordance of Teachers using a set of teachers with access to different future frame (Privileged Information) temporal window 
@@ -113,7 +113,7 @@ unlabeled dataset Du as shown bellow.
 1. generate pseudo labels for the 80/% unlabeled data using the trained Teacher models (e.g., T-1_1, T-2_2, T-3_3) 
    - run 
    ```
-   sh script/sematickitti/infer_T3_3_s20.sh
+   sh script/sematickitti/run_infer_T3_3_s20.sh
    ```
 2. generate concordance of teachers
    - run 
@@ -122,17 +122,17 @@ unlabeled dataset Du as shown bellow.
    ```
 
 ### Training Student models with distilled knowledge form Concordance of teachers
-1. modify the config/semantickitti/semantickitti_f0_0_T11_33_ssl_s20_p80.yaml with your custom settings. We provide a sample yaml for SemanticKITTI multi-frame (both past and future) aggregation
+1. modify the config/semantickitti/semantickitti_S0_0_T11_33_ssl_s20_p80.yaml with your custom settings. We provide a sample yaml for SemanticKITTI multi-frame (both past and future) aggregation
 2. train the network by running 
    ```
-   sh script/sematickitti/train_f0_0_T11_33_ssl_s20_p80.sh
+   sh script/sematickitti/run_train_f0_0_T11_33_ssl_s20_p80.sh
    ```
 
 ## Testing
-1. modify the config/semantickitti/semantickitti_f0_0_T11_33_ssl_s20_p80.yaml with your custom settings. We provide a sample yaml for SemanticKITTI multi-frame (both past and future) aggregation
+1. modify the config/semantickitti/semantickitti_S0_0_T11_33_ssl_s20_p80.yaml with your custom settings. We provide a sample yaml for SemanticKITTI multi-frame (both past and future) aggregation
 2. train the network by running 
    ```
-   sh script/sematickitti/test_f0_0_T11_33_ssl_s20_p80.sh
+   sh script/sematickitti/run_test_S0_0_T11_33_ssl_s20_p80.sh
    ```
 
 ### Pretrained Models

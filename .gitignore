@@ -1,5 +1,6 @@
 # Ignore all emacs backup files
 *~
+.idea
 # Default ignored files
 /shelf/
 /workspace.xml
