@@ -68,7 +68,7 @@ unlabeled dataset Du as shown bellow.
     │        ├── poses.txt
     │        └── times.txt
     └──Unlabeled-sequences (80% training sequence (00 - 10) for pseudo-labeling sufexted with '80')
-        ├── 0000/   # 0000 - 00010 for pseudo-labeling
+        ├── 0080/   # 0080 - 1080 for pseudo-labeling
         │   ├── velodyne/	
         │   │	├── 000000.bin
         │   │	├── 000001.bin
@@ -140,11 +140,12 @@ unlabeled dataset Du as shown bellow.
 
 
 ## TODO List
-- [x] Release pretrained model for semanticKITTI.
 - [x] Provided Inference/test code for submission to leaderboard SemanticKITTI.
 - [x] Support Future-frame supervision semantic segmentation.
 - [x] Support Concordance of Teachers with Privilege Information.
 - [X] Support Knowledge Distillation on single-frame and multi-frame semantic segmentation .
+- [ ] Release pretrained model for semanticKITTI.
+- [ ] Release data preparation code.
 - [ ] Integrate Teachers in Concordance for LiDAR 3D Object Detection into the codebase.
 - [ ] Release pretrained model for WOD.
 
