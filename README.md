@@ -134,7 +134,7 @@ unlabeled dataset Du as shown bellow.
    ```
 
 ### Pretrained Models
--- We provide a pretrained model for SemanticKITTI [LINK1]() (access code)
+-- Pretrained model for SemanticKITTI (soon)
 
 -- For Waymo Open Dataset (WOD), please refer to [WOD-GUIDE](./WOD-GUIDE.md)
 
@@ -151,9 +151,14 @@ unlabeled dataset Du as shown bellow.
 
 ## Reference
 
-If you find our work useful in your research, please consider citing our [paper]():
+If you find our work useful in your research, please consider citing our [paper](https://arxiv.org/abs/2207.06079):
 ```
-
+@article{gebrehiwot2022teachers,
+  title={Teachers in concordance for pseudo-labeling of 3D sequential data},
+  author={Gebrehiwot, Awet Haileslassie and Vacek, Patrik and Hurych, David and Zimmermann, Karel and Perez, Patrick and Svoboda, Tom{\'a}{\v{s}}},
+  journal={arXiv preprint arXiv:2207.06079},
+  year={2022}
+}
 ```
 
 ## Acknowledgments
