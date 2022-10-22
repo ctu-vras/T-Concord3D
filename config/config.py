@@ -84,8 +84,8 @@ train_params = Map(
         "learning_rate": Float(),
         "past": Int(),
         "future": Int(),
-        "T_past": Int(),
-        "T_future": Int(),
+        "T_past": Str(),
+        "T_future": Str(),
         "ssl": Bool(),
         "rgb": Bool(),
      }

@@ -33,7 +33,8 @@ def get_model_class(name):
 @register_dataset
 class voxel_dataset(data.Dataset):
     def __init__(self, in_dataset, grid_size, rotate_aug=False, flip_aug=False, ignore_label=255, return_test=False,
-                 fixed_volume_space=False, max_volume_space=[50, 50, 1.5], min_volume_space=[-50, -50, -3], cut_mix=False):
+                 fixed_volume_space=False, max_volume_space=[50, 50, 1.5], min_volume_space=[-50, -50, -3],
+                 cut_mix=False):
         'Initialization'
         self.point_cloud_dataset = in_dataset
         self.grid_size = np.asarray(grid_size)
@@ -79,15 +80,15 @@ class voxel_dataset(data.Dataset):
         # cut mix data augmentation by grabbing instance and add it to a new scene
         if self.cut_mix:
             # load/grab the object
-            dir='/mnt/beegfs/gpu/argoverse-tracking-all-training/WOD/processed/Labeled/cut_mix'
+            dir = '/mnt/beegfs/gpu/argoverse-tracking-all-training/WOD/processed/Labeled/cut_mix'
             new_xyz = np.load(f"{dir}/pcl.npy")
             new_label_all = np.load(f"{dir}/ss_id.npy")
-            unique_obj = np.unique(new_label_all[:,0])
+            unique_obj = np.unique(new_label_all[:, 0])
 
             sel_obj_rand = np.random.choice(len(unique_obj), 5)
             new_label = []
             for id in sel_obj_rand:
-                obj_mask = new_label_all[:,0] == id
+                obj_mask = new_label_all[:, 0] == id
                 new_label.append(new_label_all[obj_mask])
 
             new_label = np.concatenate(new_label, axis=0)
@@ -105,13 +106,13 @@ class voxel_dataset(data.Dataset):
             j = np.matrix([[c, s], [-s, c]])
             new_xyz[:, :2] = np.dot(new_xyz[:, :2], j)
 
-        xyz = np.concatenate(xyz, new_xyz[:,:3], axis=0)
-        labels = np.concatenate(labels, new_label[:,1], axis=0)
+        xyz = np.concatenate(xyz, new_xyz[:, :3], axis=0)
+        labels = np.concatenate(labels, new_label[:, 1], axis=0)
 
         if sig is not None:
-            sig = np.concatenate(sig, new_xyz[:,3], axis=0)
+            sig = np.concatenate(sig, new_xyz[:, 3], axis=0)
         if lcw is not None:
-            lcw = np.concatenate(lcw, np.ones_like(new_label[:,1]), axis=0)
+            lcw = np.concatenate(lcw, np.ones_like(new_label[:, 1]), axis=0)
         # random data augmentation by rotation
         if self.rotate_aug:
             rotate_rad = np.deg2rad(np.random.random() * 360)
@@ -175,7 +176,8 @@ class voxel_dataset(data.Dataset):
         if len(data) == 2:
             return_fea = return_xyz
         elif len(data) >= 3:
-            return_fea =  np.concatenate((return_xyz, sig[..., np.newaxis]), axis=1) #np.concatenate((return_xyz, sig), axis=1)#
+            return_fea = np.concatenate((return_xyz, sig[..., np.newaxis]),
+                                        axis=1)  # np.concatenate((return_xyz, sig), axis=1)#
 
         if self.return_test:
             data_tuple += (grid_ind, labels, return_fea, index)
@@ -212,7 +214,7 @@ class cylinder_dataset(data.Dataset):
                  scale_aug=False,
                  transform_aug=False, trans_std=[0.1, 0.1, 0.1],
                  min_rad=-np.pi / 4, max_rad=np.pi / 4,
-                 cut_mix=False):
+                 cut_mix=False, use_tta=False):
         self.point_cloud_dataset = in_dataset
         self.grid_size = np.asarray(grid_size)
         self.rotate_aug = rotate_aug
@@ -226,6 +228,7 @@ class cylinder_dataset(data.Dataset):
         self.transform = transform_aug
         self.trans_std = trans_std
         self.cut_mix = cut_mix
+        self.use_tta = use_tta
 
         self.noise_rotation = np.random.uniform(min_rad, max_rad)
 
@@ -257,6 +260,19 @@ class cylinder_dataset(data.Dataset):
     def __getitem__(self, index):
         'Generates one sample of data'
         data = self.point_cloud_dataset[index]
+        if self.use_tta:
+            data_total = []
+            voting = 4
+            for idx in range(voting):
+                data_single_ori = self.get_single_sample(data, index, idx)
+                data_total.append(data_single_ori)
+            data_total = tuple(data_total)
+            return data_total
+        else:
+            data_single = self.get_single_sample(data, index)
+            return data_single
+
+    def get_single_sample(self, data, index, vote_idx=0):
         split = self.point_cloud_dataset.imageset
         # initialization
         xyz = None
@@ -285,17 +301,17 @@ class cylinder_dataset(data.Dataset):
         # cut mix data augmentation by grabbing instance and add it to a new scene
         if self.cut_mix and ((split == 'train') or (split == 'ssl')):
             # load/grab the object
-            dir='/mnt/beegfs/gpu/argoverse-tracking-all-training/WOD/processed/Labeled/cut_mix'
+            dir = '/mnt/beegfs/gpu/argoverse-tracking-all-training/WOD/processed/Labeled/cut_mix'
             new_xyz_all = np.load(f"{dir}/pcl.npy")
             new_label_all = np.load(f"{dir}/ss_id.npy")
-            unique_obj = np.unique(new_label_all[:,0])
+            unique_obj = np.unique(new_label_all[:, 0])
             num_object = 10
 
             sel_obj_rand = np.random.choice(len(unique_obj), num_object)
             aug_label = []
             aug_xyz = []
             for id in sel_obj_rand:
-                obj_mask = new_label_all[:,0] == id
+                obj_mask = new_label_all[:, 0] == id
 
                 new_label = new_label_all[obj_mask]
                 new_xyz = new_xyz_all[obj_mask]
@@ -303,23 +319,26 @@ class cylinder_dataset(data.Dataset):
                 # perform random mix/placement on the road
                 road_mask = np.squeeze(labels) == 18
                 road_pcl = xyz[road_mask]
-                
+
                 mix_pos_rand = np.random.choice(len(road_pcl), 1)
-                
-                mix_position = road_pcl[mix_pos_rand,:]
 
-                mix_p_x = mix_position[:,0] - 0.5
-                mix_p_y = mix_position[:,1] - 0.5
-                mix_p_z = mix_position[:,2] 
-                
+                mix_position = road_pcl[mix_pos_rand, :]
+
+                mix_p_x = mix_position[:, 0] - 0.5
+                mix_p_y = mix_position[:, 1] - 0.5
+                mix_p_z = mix_position[:, 2]
+
                 new_xyz[:, 0] = new_xyz[:, 0] - np.max(new_xyz[:, 0])
-                new_xyz[:, 1] = new_xyz[:, 1] - np.max(new_xyz[:, 1])                
+                new_xyz[:, 1] = new_xyz[:, 1] - np.max(new_xyz[:, 1])
                 new_xyz[:, 2] = new_xyz[:, 2] - np.min(new_xyz[:, 2])
-                                
-                new_xyz[:, 0] = new_xyz[:, 0] + mix_p_x
-                new_xyz[:, 1] = new_xyz[:, 1] + mix_p_y                               
-                new_xyz[:, 2] = new_xyz[:, 2] + mix_p_z
 
+                new_xyz[:, 0] = new_xyz[:, 0] + mix_p_x
+                new_xyz[:, 1] = new_xyz[:, 1] + mix_p_y
+                new_xyz[:, 2] = new_xyz[:, 2] + mix_p_z
+                if self.use_tta:
+                    flip_type = vote_idx
+                else:
+                    flip_type = np.random.choice(4, 1)
                 if flip_type == 1:
                     new_xyz[:, 0] = -new_xyz[:, 0]
                 elif flip_type == 2:
@@ -336,7 +355,7 @@ class cylinder_dataset(data.Dataset):
                 mframe = int(len(new_xyz) / 130000)
                 if mframe > 1:
                     for i in range(1, mframe):
-                        new_xyz[:,0] = new_xyz[:,0] - i/2
+                        new_xyz[:, 0] = new_xyz[:, 0] - i / 2
                         aug_label.append(new_label)
                         aug_xyz.append(new_xyz)
 
@@ -344,15 +363,15 @@ class cylinder_dataset(data.Dataset):
             new_xyz = np.concatenate(aug_xyz, axis=0)
 
             # combine gt data and cut_mix augmentation
-            xyz = np.concatenate([xyz, new_xyz[:,:3]], axis=0)
-            labels = np.concatenate([labels, new_label[:,1].reshape(-1,1)], axis=0)
+            xyz = np.concatenate([xyz, new_xyz[:, :3]], axis=0)
+            labels = np.concatenate([labels, new_label[:, 1].reshape(-1, 1)], axis=0)
 
             if sig is not None:
-                sig = np.concatenate([sig.reshape(-1,1), new_xyz[:,3].reshape(-1,1)], axis=0)
+                sig = np.concatenate([sig.reshape(-1, 1), new_xyz[:, 3].reshape(-1, 1)], axis=0)
                 sig = np.squeeze(sig)
             if lcw is not None:
-                new_lcw = np.ones_like(new_label[:,1]) * 100
-                lcw = np.concatenate([lcw, new_lcw.reshape(-1,1)], axis=0)
+                new_lcw = np.ones_like(new_label[:, 1]) * 100
+                lcw = np.concatenate([lcw, new_lcw.reshape(-1, 1)], axis=0)
 
         # random data augmentation by rotation
         if self.rotate_aug:
@@ -363,7 +382,10 @@ class cylinder_dataset(data.Dataset):
 
         # random data augmentation by flip x , y or x+y
         if self.flip_aug:
-            flip_type = np.random.choice(4, 1)
+            if self.use_tta:
+                flip_type = vote_idx
+            else:
+                flip_type = np.random.choice(4, 1)
             if flip_type == 1:
                 xyz[:, 0] = -xyz[:, 0]
             elif flip_type == 2:
@@ -422,7 +444,6 @@ class cylinder_dataset(data.Dataset):
 
         data_tuple = (voxel_position, processed_label)
 
-
         # center data on each voxel for PTnet
         voxel_centers = (grid_ind.astype(np.float32) + 0.5) * intervals + min_bound
         return_xyz = xyz_pol - voxel_centers
@@ -431,7 +452,8 @@ class cylinder_dataset(data.Dataset):
         if len(data) == 2:
             return_fea = return_xyz
         elif len(data) >= 3:
-            return_fea = np.concatenate((return_xyz, sig[..., np.newaxis]), axis=1) #np.concatenate((return_xyz, sig), axis=1) #
+            return_fea = np.concatenate((return_xyz, sig[..., np.newaxis]),
+                                        axis=1)  # np.concatenate((return_xyz, sig), axis=1) #
 
         if self.return_test:
             data_tuple += (grid_ind, labels, return_fea, index)
@@ -554,7 +576,8 @@ class polar_dataset(data.Dataset):
         if len(data) == 2:
             return_fea = return_xyz
         elif len(data) >= 3:
-            return_fea = np.concatenate((return_xyz, sig[..., np.newaxis]), axis=1) #np.concatenate((return_xyz, sig), axis=1) #
+            return_fea = np.concatenate((return_xyz, sig[..., np.newaxis]),
+                                        axis=1)  # np.concatenate((return_xyz, sig), axis=1) #
 
         if self.return_test:
             data_tuple += (grid_ind, labels, return_fea, index)
@@ -631,7 +654,55 @@ def collate_fn_BEV(data):
         # return torch.from_numpy(data2stack), torch.from_numpy(label2stack), grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index, lcw2stack
 
     # return torch.from_numpy(data2stack), torch.from_numpy(label2stack), grid_ind_stack, point_label, xyz
-    return torch.from_numpy(data2stack), torch.from_numpy(label2stack), grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index, lcw2stack
+    return torch.from_numpy(data2stack), torch.from_numpy(
+        label2stack), grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index, lcw2stack
+
+
+def collate_fn_BEV_tta(data):
+
+    data2stack = np.stack([da2[0] for da1 in data for da2 in da1]).astype(np.float32)
+    label2stack = np.stack([da2[1] for da1 in data for da2 in da1]).astype(np.int)
+
+    voxel_label = []
+    for da1 in data:
+        for da2 in da1:
+            voxel_label.append(da2[1])
+    #voxel_label.astype(np.int)
+    grid_ind_stack = []
+    for da1 in data:
+        for da2 in da1:
+            grid_ind_stack.append(da2[2])
+    point_label = []
+    for da1 in data:
+        for da2 in da1:
+            point_label.append(da2[3])
+    xyz = []
+    for da1 in data:
+        for da2 in da1:
+            xyz.append(da2[4])
+    # index = []
+    # for da1 in data:
+    #     for da2 in da1:
+    #         index.append(da2[5])
+
+    ref_st_index = None
+    ref_end_index = None
+    lcw2stack = None
+    # if multi frame but not ssl: also add the start and end index of reference scan/frame
+    if len(data[0]) == 7:
+        ref_st_index = [da2[5] for da1 in data for da2 in da1]
+        ref_end_index = [da2[6] for da1 in data for da2 in da1]
+        # return torch.from_numpy(data2stack), torch.from_numpy(label2stack), grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index
+
+    # if ssl and multi frame: also add the start and end index of reference scan/frame and
+    # confidence probability pseudo label
+    elif len(data[0]) == 8:
+        ref_st_index = [da2[6] for da1 in data for da2 in da1]
+        ref_end_index = [da2[7] for da1 in data for da2 in da1]
+        lcw2stack = np.stack([da2[5] for da1 in data for da2 in da1]).astype(np.float32)
+    # return xyz, voxel_label, grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index, lcw2stack
+    return torch.from_numpy(data2stack), torch.from_numpy(
+        label2stack), grid_ind_stack, point_label, xyz, ref_st_index, ref_end_index, lcw2stack
 
 
 def collate_fn_BEV_test(data):

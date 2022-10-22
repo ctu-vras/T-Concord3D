@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from network.cylinder_spconv_3d import get_model_class
-from network.segmentator_3d_asymm_spconv import Asymm_3d_spconv
-from network.cylinder_fea_generator import cylinder_fea
+from model.cylinder_3d import get_model_class
+from model.segment_3d import Asymm_3d_spconv
+from model.cylinder_feature import cylinder_fea
 
 
 def build(model_config):

@@ -290,7 +290,6 @@ def lovasz_softmax_flat_lcw(probas, labels, lcw=None, classes='present'):
     return mean(losses)
 
 
-
 def flatten_probas_lcw(probas, labels, ignore=None, lcw=None):
     """
     Flattens predictions in the batch

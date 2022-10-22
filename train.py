@@ -13,7 +13,7 @@ import torch.optim as optim
 from tqdm import tqdm
 
 from utils.metric_util import per_class_iu, fast_hist_crop
-from dataloader.pc_dataset import get_SemKITTI_label_name, update_config
+from dataloader.pc_dataset import get_label_name, update_config
 from builder import data_builder, model_builder, loss_builder
 from config.config import load_config_data
 
@@ -76,7 +76,7 @@ def main(args):
     model_load_path = train_hypers['model_load_path']
     model_save_path = train_hypers['model_save_path']
 
-    SemKITTI_label_name = get_SemKITTI_label_name(dataset_config["label_mapping"])
+    SemKITTI_label_name = get_label_name(dataset_config["label_mapping"])
     unique_label = np.asarray(sorted(list(SemKITTI_label_name.keys())))[1:] - 1
     unique_label_str = [SemKITTI_label_name[x] for x in unique_label + 1]
 
@@ -104,11 +104,6 @@ def main(args):
     focal_loss = False  # True
 
     # 20 class number of samples from training sample
-    per_class_count = np.array([3.36552520e+07, 4.24645650e+07, 9.30680000e+04, 5.12361000e+05,
-                                2.66789400e+06, 2.96548400e+06, 3.16252000e+05, 7.69900000e+04,
-                                2.69060000e+04, 1.90390273e+08, 1.44885870e+07, 1.30096105e+08,
-                                5.36779100e+06, 1.15425597e+08, 4.72169130e+07, 2.45959814e+08,
-                                6.53122800e+06, 1.00672267e+08, 2.77797500e+06, 7.42047000e+05])
 
     class_weights = np.array([1.40014903e+00, 1.10968683e+00, 5.06321920e+02, 9.19710291e+01,
                               1.76627589e+01, 1.58902791e+01, 1.49002594e+02, 6.12058299e+02,
@@ -297,7 +292,7 @@ if __name__ == '__main__':
     # Training settings
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-y', '--config_path',
-                        default='config/semantickitti/semantickitti_S0_0_T11_33_ssl_s20_p80.yaml')
+                        default='config/semantickitti/nuscenes_S0_0_T11_33_ssl_s20_p80.yaml')
     parser.add_argument('-g', '--mgpus', action='store_true', default=False)
     parser.add_argument("--local_rank", default=0, type=int)
     args = parser.parse_args()

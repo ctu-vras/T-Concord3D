@@ -26,7 +26,7 @@ dataset_params:
   ignore_label: 0
   return_test: False
   fixed_volume_space: True
-  label_mapping: "./config/label_mapping/sematickitti/semantic-kitti_s20.yaml"
+  label_mapping: "./config/label_mapping/sematickitti/semantic-kitti_ssl_teacher_student.yaml"
   max_volume_space:
     - 50
     - 3.1415926
@@ -39,19 +39,15 @@ dataset_params:
 ###################
 ## Data_loader options
 train_data_loader:
-  data_path: "/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences"
-  #"/mnt/data/vras/data/gebreawe/semantic-kitti/dataset/sequences"
-  #"/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences" #"/data/dataset/semantic_kitti/data_semkitti/dataset/sequences/"
+  data_path: "/mnt/personal/gebreawe/Datasets/RealWorld/semantic-kitti/train_pseudo_60/sequences"
   imageset: "train"
   return_ref: True
-  batch_size: 3 #4
+  batch_size: 4 #4
   shuffle: True
   num_workers: 4
 
 val_data_loader:
-  data_path: "/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences"
-  #"/mnt/data/vras/data/gebreawe/semantic-kitti/dataset/sequences"
-  #"/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences" #"/data/dataset/semantic_kitti/data_semkitti/dataset/sequences/"
+  data_path: "/mnt/personal/gebreawe/Datasets/RealWorld/semantic-kitti/train_pseudo_60/sequences"
   imageset: "val"
   return_ref: True
   batch_size: 4
@@ -59,9 +55,7 @@ val_data_loader:
   num_workers: 0
   
 test_data_loader:
-  data_path: "/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences"
-  #"/mnt/data/vras/data/gebreawe/semantic-kitti/dataset/sequences"
-  #"/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences" #"/data/dataset/semantic_kitti/data_semkitti/dataset/sequences/"
+  data_path: "/mnt/personal/gebreawe/Datasets/RealWorld/semantic-kitti/train_pseudo_60/sequences"
   imageset: "test"
   return_ref: True
   batch_size: 4
@@ -69,20 +63,18 @@ test_data_loader:
   num_workers: 4
 
 ssl_data_loader:
-  data_path: "/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_20/sequences"
-  #"/mnt/data/vras/data/gebreawe/semantic-kitti/dataset/sequences"
-  #"/mnt/beegfs/gpu/argoverse-tracking-all-training/semantic-kitti/train_pseudo_10/sequences" #"/data/dataset/semantic_kitti/data_semkitti/dataset/sequences/"
-  imageset: "ssl"
+  data_path: "/mnt/personal/gebreawe/Datasets/RealWorld/semantic-kitti/train_pseudo_60/sequences"
+  imageset: "pseudo"
   return_ref: True
-  batch_size: 1
+  batch_size: 4
   shuffle: False
   num_workers: 4
 
 ###################
 ## test params
 train_params:
-  model_load_path: "./model_save_dir/model_save_f1_1_s20_b4_t2.pt"
-  model_save_path: "./model_save_dir/model_save_f1_1_s20_b4_t2.pt"
+  model_load_path: "./model_save_dir/model_save_f1_1_s60_b4_t1.pt"
+  model_save_path: "./model_save_dir/model_save_f1_1_s60_b4_t1.pt"
   checkpoint_every_n_steps: 1000
   max_num_epochs: 40
   eval_every_n_steps: 1000
@@ -90,6 +82,6 @@ train_params:
   past: 1
   future: 1
   T_past: 1
-  T_future: 12
+  T_future: 11
   ssl: False
   rgb: False
